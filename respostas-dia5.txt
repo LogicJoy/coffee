@@ -1,0 +1,66 @@
+4º BIMESTRE - Projeto Café Mobile - DIA 5 - Virando PWA
+Respostas
+
+5.1 O que é um PWA
+
+PWA (Progressive Web App) é um site que pode ser instalado no celular ou no computador e se comporta como um app: abre em tela cheia, tem ícone na tela inicial e pode funcionar sem internet. O Café Mobile continua sendo o mesmo site (HTML, CSS e JavaScript). O que muda é que ele ganhou três arquivos e algumas linhas novas que o transformam em PWA.
+
+5.2 manifest.json
+
+É o "documento de identidade" do app. Ele diz ao celular:
+- name e short_name: o nome completo e o nome curto que aparece embaixo do ícone ("Café Mobile").
+- start_url: a página que abre ao tocar no ícone (./index.html).
+- display: "standalone" faz o app abrir sem a barra de endereço do navegador, como um app de verdade.
+- background_color e theme_color: as cores da tela de abertura e da barra superior do celular.
+- icons: os ícones de 192 px, 512 px e o ícone "maskable" de 512 px, que o Android recorta no formato do aparelho.
+
+No index.html, a linha <link rel="manifest" href="manifest.json"> conecta o arquivo ao app.
+
+5.3 Ícones
+
+Foram criados três ícones (icons/icon-192.png, icons/icon-512.png e icons/icon-maskable-512.png). O ícone maskable tem a parte importante dentro de um círculo central, para não ser cortado pelo Android.
+
+Como o iPhone não lê os ícones do manifest, foi preciso adicionar também <link rel="apple-touch-icon" href="icons/icon-192.png"> no index.html.
+
+5.4 Service Worker (sw.js)
+
+O service worker é um programa que roda em segundo plano, entre o app e a internet. Ele guarda uma cópia dos arquivos do app no celular, para o app abrir mesmo sem internet.
+
+O arquivo tem três partes:
+1. Instalação (install): baixa e guarda no cache todos os arquivos da lista ARQUIVOS (index.html, CSS, JavaScript, manifest e ícones). Também chama skipWaiting, para a nova versão ser ativada logo.
+2. Ativação (activate): apaga os caches de versões antigas, deixando só o cache atual (cafe-mobile-v1).
+3. Busca (fetch): toda requisição passa por aqui. A estratégia é "rede primeiro": tenta buscar na internet e guarda uma cópia atualizada no cache. Se não houver internet, entrega a cópia guardada.
+
+Regra importante: sempre que mudar algum arquivo da lista ARQUIVOS, é preciso trocar o número da versão (CACHE = "cafe-mobile-v2", por exemplo). Sem isso, o celular pode continuar usando a versão antiga guardada.
+
+5.5 Registro e instalação (js/pwa.js)
+
+- Registro: no evento load, o pwa.js registra o sw.js. O console mostra "Service Worker registrado!" quando dá certo.
+- Botão Instalar: o navegador dispara o evento beforeinstallprompt quando o app pode ser instalado. O pwa.js cancela o aviso automático (preventDefault), guarda o evento e mostra o botão "Instalar" no cabeçalho. Ao clicar, chama prompt() e mostra a janela de instalação.
+- Aviso de instalado: o evento appinstalled mostra "☕ Café Mobile instalado!".
+- No iPhone esse evento não existe. A instalação é feita por Compartilhar > Adicionar à Tela de Início.
+
+5.6 Compartilhamento (Web Share API)
+
+- Pedido: o botão "📤 Compartilhar pedido" monta um texto com os itens, quantidades, preços e total, e chama navigator.share(). Abre a janela nativa do celular (WhatsApp, e-mail etc.). Em computador sem suporte, o texto é copiado com navigator.clipboard.writeText().
+- Foto: cada foto da galeria tem o botão 📤. A imagem guardada em texto (base64) é convertida em um arquivo de verdade (File). Antes de compartilhar, navigator.canShare({ files }) verifica se o aparelho consegue enviar arquivos. Se não conseguir, aparece o aviso "Este aparelho não compartilha imagens".
+
+5.7 Ligações entre os arquivos
+
+- index.html carrega, nesta ordem: dados.js, app.js, camera.js e pwa.js.
+- O pwa.js usa funções do app.js (mostrarAviso, formatarPreco, calcularTotal e a lista pedido).
+- O camera.js chama compartilharFoto(), que está no pwa.js.
+- O app.js chama desligarCamera(), que está no camera.js.
+
+5.8 Teste feito no navegador
+
+- O app abriu em http://127.0.0.1:8080 sem erros no console.
+- O manifest foi lido com nome "Café Mobile" e display "standalone".
+- O service worker ficou com estado "activated".
+- Foram adicionados itens ao pedido e a aba Pedido mostrou os itens, o total e o contador. Ver as imagens 01-cardapio-navegador.jpeg e 02-pedido-navegador.jpeg na pasta provas.
+
+5.9 Limitações
+
+- A câmera e o service worker só funcionam em HTTPS ou localhost. Por isso o app precisa ser publicado (GitHub Pages) para testar no celular.
+- O botão Instalar só aparece em navegadores que suportam beforeinstallprompt (Chrome e Edge no Android e no computador).
+- O cache guarda apenas os arquivos da lista ARQUIVOS. Fotos e pedidos continuam no localStorage, que é separado do cache.
