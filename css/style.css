@@ -463,3 +463,55 @@ video.espelhado {
   font-size: 1rem;
   cursor: pointer;
 }
+
+/* ---------- Desafio: modo escuro automático ---------- */
+/* Segue a configuração de tema do celular (claro ou escuro) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cor-principal: #d4a373;
+    --cor-destaque: #b98555;
+    --cor-fundo: #1c1714;
+    --cor-card: #2a221d;
+    --cor-texto: #f3e9df;
+    --cor-texto-suave: #b5a395;
+    --sombra: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  .topo {
+    background: #3a2c22;
+  }
+
+  .filtro,
+  .btn-qtd {
+    background: transparent;
+    color: var(--cor-texto);
+  }
+
+  .filtro.ativo,
+  .btn-principal {
+    color: #1c1714;
+  }
+
+  .abas {
+    background: #2a221d;
+    border-top-color: #3a2c22;
+  }
+
+  .btn-qtd {
+    background: #2a221d;
+  }
+}
+
+/* ---------- Desafio: faixa "Você está offline" ---------- */
+.faixa-offline {
+  padding: 8px 16px;
+  background: #c0392b;
+  color: #fff;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.faixa-offline[hidden] {
+  display: none;
+}

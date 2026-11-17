@@ -92,3 +92,15 @@ async function compartilharFoto(foto) {
     mostrarAviso("Este aparelho não compartilha imagens");
   }
 }
+
+// ---------- 4. Desafio: faixa "Você está offline" ----------
+// navigator.onLine diz se há internet; os eventos online/offline avisam quando muda
+const faixaOffline = document.querySelector("#faixa-offline");
+
+function atualizarFaixaOffline() {
+  faixaOffline.hidden = navigator.onLine;
+}
+
+window.addEventListener("online", atualizarFaixaOffline);
+window.addEventListener("offline", atualizarFaixaOffline);
+atualizarFaixaOffline();
