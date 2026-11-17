@@ -79,12 +79,24 @@ function criarCard(produto) {
   return card;
 }
 
+// A categoria e o texto da busca funcionam juntos: a lista mostra o que combina com os dois
+let categoriaAtual = "Todos";
+let textoBusca = "";
+
 function mostrarCardapio(categoria) {
+  if (categoria) {
+    categoriaAtual = categoria;
+  }
   listaProdutos.innerHTML = "";
   for (const produto of produtos) {
-    if (categoria === "Todos" || produto.categoria === categoria) {
+    const combinaCategoria = categoriaAtual === "Todos" || produto.categoria === categoriaAtual;
+    const combinaBusca = produto.nome.toLowerCase().includes(textoBusca.toLowerCase());
+    if (combinaCategoria && combinaBusca) {
       listaProdutos.appendChild(criarCard(produto));
     }
+  }
+  if (listaProdutos.children.length === 0) {
+    listaProdutos.innerHTML = '<p class="vazio">Nenhum produto encontrado.</p>';
   }
 }
 
@@ -97,6 +109,11 @@ for (const botao of botoesFiltro) {
     mostrarCardapio(botao.dataset.categoria);
   });
 }
+
+document.querySelector("#busca").addEventListener("input", function (evento) {
+  textoBusca = evento.target.value.trim();
+  mostrarCardapio();
+});
 
 // ---------- Pedido ----------
 
